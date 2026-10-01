@@ -1,6 +1,7 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.InputSystem;
 
 /// <summary>
@@ -16,6 +17,15 @@ public class InformationInterface : MonoBehaviour
 
     [SerializeField, Tooltip("Référence au texte affichant la texteVitesse.")]
     TextMeshProUGUI texteVitesse;
+
+    [SerializeField, Tooltip("Référence au texte affichant la texteVitesse.")]
+    Image imagecharge1;
+
+    [SerializeField, Tooltip("Référence au texte affichant la texteVitesse.")]
+    Image imagecharge2;
+
+    [SerializeField, Tooltip("Référence au texte affichant la texteVitesse.")]
+    Image imagecharge3;
 
     [SerializeField, Tooltip("Référence au gestionnaire de surfaces.")]
     private GestionnaireSurface gestionnaireSurface;
@@ -75,5 +85,30 @@ public class InformationInterface : MonoBehaviour
     
         texteVitesse.text = $"{boule.Velocite.magnitude:F2}";
         texteNombreSurfacesParcourues.text = gestionnaireSurface.SurfacesParcourues.ToString();
+
+        if (boule.nbCharges == 3)
+        {
+            imagecharge1.enabled = true;
+            imagecharge2.enabled = true;
+            imagecharge3.enabled = true;
+        }
+        else if (boule.nbCharges == 2)
+        {
+            imagecharge1.enabled = true;
+            imagecharge2.enabled = true;
+            imagecharge3.enabled = false;
+        }
+        else if (boule.nbCharges == 1)
+        {
+            imagecharge1.enabled = true;
+            imagecharge2.enabled = false;
+            imagecharge3.enabled = false;
+        }
+        else
+        {
+            imagecharge1.enabled = false;
+            imagecharge2.enabled = false;
+            imagecharge3.enabled = false;
+        }
     }
 }

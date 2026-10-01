@@ -25,6 +25,16 @@ public class Boule : MonoBehaviour
     /// </summary>
     public Vector3 Velocite => rigidbody.linearVelocity;
 
+    /// <summary>
+    /// État de la balle
+    /// </summary>
+    private bool estLancee = false;
+
+    /// <summary>
+    /// Nombre de charges d'accélération
+    /// </summary>
+    public int nbCharges { get; private set; }
+
     private void Start()
     {
         rigidbody = GetComponent<Rigidbody>();
@@ -50,6 +60,17 @@ public class Boule : MonoBehaviour
         {
             cibleCamera.position = rigidbody.position;
         }
+
+        if (!estLancee)
+        {
+            Commencer();
+        } 
+        else
+        {
+            return;
+        }
+
+        Accelerer();
     }
 
     private void FixedUpdate()
@@ -73,5 +94,70 @@ public class Boule : MonoBehaviour
         {
             rigidbody.AddForce(forceAppliquee, ForceMode.Force);
         }
+    }
+
+    private void Commencer()
+    {
+        if (estLancee)
+            return;
+
+        if (ControleurJeu.Instance == null)
+            return;
+
+        PlayerInput controle = ControleurJeu.Instance.Controles;
+
+        if (controle == null)
+            return;
+
+        controle.actions.FindAction("Commencer").performed += LancerBalle;
+    }
+
+    private void LancerBalle(InputAction.CallbackContext contexte)
+    {
+        if (estLancee)
+            return;
+
+        // Pas de vérifications pcq déjà vérifiées dans Commencer
+        ControleurJeu.Instance.Controles.actions.FindAction("Diriger").performed += CommencerDirection;
+        ControleurJeu.Instance.Controles.actions.FindAction("Diriger").canceled += ArreterDirection;
+
+        rigidbody.useGravity = true;
+        estLancee = true;
+    }
+
+    public void AjouterCharge()
+    {
+        if (nbCharges >= 3)
+            return;
+
+        nbCharges++;
+
+        Debug.Log(nbCharges);
+    }
+
+    public void Accelerer()
+    {
+        if (ControleurJeu.Instance == null)
+            return;
+
+        PlayerInput controle = ControleurJeu.Instance.Controles;
+
+        if (controle == null)
+            return;
+
+        controle.actions.FindAction("Accelerer").performed += Accelereration;
+    }
+
+    public void Accelereration(InputAction.CallbackContext contexte)
+    {
+        if (!estLancee)
+            return;
+
+        if (nbCharges == 0)
+            return;
+
+        Debug.Log("Acceleration");
+        rigidbody.AddForce(transform.forward * 15, ForceMode.Acceleration);
+        nbCharges--;
     }
 }
